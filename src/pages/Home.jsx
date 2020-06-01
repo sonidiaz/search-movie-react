@@ -1,42 +1,62 @@
-import React, { Component } from 'react';
-import {Title} from '../component/title';
-import MoviesList from '../component/MoviesList';
-import SearchMovie from '../component/SearchFroms';
+import React, { useState, useEffect } from "react";
+import MoviesList from "../component/MoviesList";
+import { Title } from "../component/title";
+import SearchMovie from "../component/SearchFroms";
+import {SyncLoader} from 'react-spinners';
+import {getMovies} from '../redux/actions/MovieAction';
+import {connect} from 'react-redux';
 
-class Home extends Component {
-    state = {
-        usedSearch: false,
-        results: []
-      }
-    
-      _hundleResults = (results) => {
-        this.setState({
-          results,
-          usedSearch: true
-        })
-      }
-      _renderResults = () => {
-        
-          return this.state.results.length === 0
-            ? <p>NO hay Resultados</p>
-            : <MoviesList movies={this.state.results} />
-        
-      }
-    render() {
-        return (
-            <div>
-                 <Title> Search Movies </Title>
-                    <div className="SearchForm-wrapper">
-                    <SearchMovie onResults={this._hundleResults} />
-                    </div>
-                    {
-                    this.state.usedSearch 
-                        ? this._renderResults()
-                        : <small>Use the form to search a movie </small>
-                    }
-            </div>
-        );
+const Home = ({movies, getIntialMovies, result, isFetching}) => {
+
+  const [usedSearch, setUsedSearch] = useState(false);
+  const [results, setResults] = useState([]);
+  const _renderResults = () => {
+    return (result === undefined) ? (
+      <p>NO hay Resultados</p>
+    ) : (
+      <MoviesList movies={results} />
+    );
+  };
+  useEffect(() => {
+    if(movies.length > 0 && result !== undefined){
+        setUsedSearch(true);
+        setResults(movies);
+      }else if (movies.length === 0 && result === undefined){
+        setUsedSearch(true);
+    }else{
+      getIntialMovies('cosmos')
     }
+  }, [movies, getIntialMovies]);
+
+
+  return (
+    <>
+      <div className="navbar">
+          <Title> Search Movies </Title>
+          <SearchMovie />
+      </div>
+      {
+        isFetching ? (<SyncLoader/>) : (
+          <div className="container">
+          {
+          usedSearch ? (
+            _renderResults()
+          ) : (
+            <small>Use the form to search a movie </small>
+          )}
+        </div>
+        )
+      }
+    </>
+  );
+};
+
+const mapDispatchToProp = (dispatch) => {
+  return {
+    getIntialMovies: (name) => dispatch(getMovies(name))
+  }
 }
 
-export default Home;
+export default connect((state) => {
+  return state.movies
+}, mapDispatchToProp)(Home);

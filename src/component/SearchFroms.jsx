@@ -1,69 +1,44 @@
-import React, { Component } from 'react';
-const API_KEY = '8a29794f'
-class SearchForm extends Component {
-	state = {
-		inputMovie: ''
-	}
+import React, { useState } from 'react';
+import {connect} from 'react-redux';
+import {getMovies} from '../redux/actions/MovieAction' 
 
-	_handleChange = (e) => {
-		this.setState ({ inputMovie: e.target.value})
+const SearchForm = ({getMovies}) => {
+	const [inputMovie, setInputMovie] = useState('');
+	const _handleChange = (e) => {
+		setInputMovie(e.target.value)
 	}
-
-	_handleSumbit = (e) => {
+	
+	const _handleSumbit = (e) => {
 		e.preventDefault();
-		const {inputMovie} = this.state;
-		fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&s=${inputMovie}`)
-				.then( res => res.json() )
-				.then( results => {
-						const { Search = [], totalResults='0' } = results;
-						console.log({Search, totalResults})
-							this.props.onResults(Search);
-						
-					}
-				)
+		getMovies(inputMovie);
 	}
-    render() {
-        return (
-						<form onSubmit={this._handleSumbit}>
-							<div className="field is-grouped">
-									<p className="control is-expanded">
-										<input 
-											onChange={this._handleChange}
-											className="input" 
-											type="text" 
-											placeholder="Buscar Pelicula"/>
-									</p>
-									<p className="control">
-										<button className="button is-info">
-											Buscar
-										</button>
-									</p>
-							</div>
-						</form>
-        )
-    }
+	return (
+		<div className="column is-two-fifths">
+			<form onSubmit={_handleSumbit}>
+				<div className="field is-grouped">
+					<p className="control is-expanded">
+						<input
+							onChange={_handleChange}
+							className="input"
+							type="text"
+							placeholder="Buscar Pelicula" 
+						/>
+					</p>
+					<p className="control">
+						<button className="button is-info is-fullwidth">
+							Buscar
+						</button>
+					</p>
+				</div>
+			</form>
+		</div>
+	);
+};
+
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		getMovies: (inputMovie) => dispatch(getMovies(inputMovie))
+	}
 }
-
-export default SearchForm;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default connect(null, mapDispatchToProps)(SearchForm);

@@ -16,12 +16,12 @@ class Detail extends Component {
 
     _fetchMovie = ({id}) => {
 
-		fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${id}`)
-				.then( res => res.json() )
-				.then( movie => {
-						this.setState({movie})
-					}
-				)
+			fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${id}`)
+					.then( res => res.json() )
+					.then( movie => {
+							this.setState({movie})
+						}
+					)
 		}
 		
 		_goBack (){
@@ -32,7 +32,7 @@ class Detail extends Component {
 			console.log(this.props)
 			const { id } = this.props.match.params ;
 			this._fetchMovie({id})
-	}
+		}
     render() {
         const { Title, Poster, Actors, Metascore, Plot } = this.state.movie
         return (
